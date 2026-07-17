@@ -33,7 +33,7 @@ export type ManagerContact = {
   id: string;
   ownerId: string;
   name: string;
-  phone: string;
+  email: string;
   createdAt: string;
 };
 
@@ -44,9 +44,9 @@ export type Submission = {
   clientName: string; // 원청명
   taxInvoice: TaxInvoiceProfile;
   contract: ContractProfile;
-  managerPhone: string;
-  smsStatus: "sent" | "failed" | "not_configured";
-  smsDetail?: string;
+  managerEmail: string;
+  emailStatus: "sent" | "failed" | "not_configured";
+  emailDetail?: string;
   createdAt: string;
 };
 

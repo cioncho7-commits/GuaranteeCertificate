@@ -1,6 +1,6 @@
 # 건설기계 대여대금 지급보증서
 
-건설기계 임대차 현장 정보를 등록하고, 담당자에게 SMS로 즉시 전달하는 Next.js 웹앱입니다.
+건설기계 임대차 현장 정보를 등록하고, 담당자에게 이메일로 즉시 전달하는 Next.js 웹앱입니다.
 
 ## 화면 구성
 
@@ -14,8 +14,8 @@
      - 사업자등록번호 / 대표자 휴대폰번호
    - 계약서 등록 (기존 정보 불러오기 또는 신규 등록)
      - 계약기간 / 단가 / 결제기한
-   - **송신 버튼**: 위 정보를 담당자 휴대폰으로 SMS 발송
-4. **담당자 설정 (`/settings`)**: SMS를 받을 담당자 이름/휴대폰번호 등록
+   - **송신 버튼**: 위 정보를 담당자 이메일로 발송
+4. **담당자 설정 (`/settings`)**: 발송받을 담당자 이름/이메일 주소 등록
 
 ## 로컬 실행
 
@@ -35,11 +35,11 @@ npm run dev
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | [Google Cloud Console](https://console.cloud.google.com) | OAuth 클라이언트 ID, 리디렉션 URI: `.../api/auth/callback/google` |
 | `AUTH_KAKAO_ID` / `AUTH_KAKAO_SECRET` | [Kakao Developers](https://developers.kakao.com) | 카카오 로그인, Redirect URI: `.../api/auth/callback/kakao` |
 | `AUTH_NAVER_ID` / `AUTH_NAVER_SECRET` | [Naver Developers](https://developers.naver.com) | 네이버 로그인, Callback URL: `.../api/auth/callback/naver` |
-| `ALIGO_API_KEY` / `ALIGO_USER_ID` / `ALIGO_SENDER` | [알리고(Aligo)](https://smartsms.aligo.in) | SMS 발송. **발신번호 사전등록(통신사 심사) 필요** |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | 구글 계정 설정 | 발신용 Gmail 계정 + [앱 비밀번호](https://myaccount.google.com/apppasswords) (2단계 인증 필요) |
 
 키가 없는 상태에서도 앱은 정상 동작합니다:
 - 로그인 버튼을 누르면 해당 제공자의 OAuth 에러 화면으로 이동합니다 (키 미설정 안내).
-- 송신 버튼을 누르면 입력한 정보는 저장되고, 화면에 "SMS 연동 키가 설정되지 않았습니다" 안내가 표시됩니다.
+- 송신 버튼을 누르면 입력한 정보는 저장되고, 화면에 "이메일 발송 계정이 설정되지 않았습니다" 안내가 표시됩니다.
 
 ## 데이터 저장
 
@@ -47,9 +47,11 @@ npm run dev
 운영 환경으로 전환 시 `src/lib/db.ts` 만 실제 DB 연동으로 교체하면 나머지 코드는 그대로 사용할 수 있습니다.
 서버리스 배포(Vercel 등)에서는 파일시스템이 영속되지 않으므로, 실제 서비스 전에는 DB 연동이 필요합니다.
 
-## SMS 발송 내용 예시
+## 이메일 발송 내용 예시
 
 ```
+제목: [건설기계 대여대금 지급보증서] OO아파트 신축공사
+
 [건설기계 대여대금 지급보증서]
 현장명: OO아파트 신축공사
 원청명: OO건설(주)

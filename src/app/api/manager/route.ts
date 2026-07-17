@@ -4,7 +4,7 @@ import { readDb, updateDb } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import type { ManagerContact } from "@/lib/types";
 
-const PHONE_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function GET() {
   const userId = await requireUserId();
@@ -23,14 +23,14 @@ export async function POST(req: Request) {
   }
   const body = await req.json();
   const name = String(body.name ?? "").trim();
-  const phone = String(body.phone ?? "").trim();
+  const email = String(body.email ?? "").trim();
 
   if (!name) {
     return NextResponse.json({ error: "담당자 이름을 입력하세요." }, { status: 400 });
   }
-  if (!PHONE_RE.test(phone)) {
+  if (!EMAIL_RE.test(email)) {
     return NextResponse.json(
-      { error: "휴대폰번호 형식이 올바르지 않습니다. (예: 010-1234-5678)" },
+      { error: "이메일 형식이 올바르지 않습니다. (예: manager@example.com)" },
       { status: 400 }
     );
   }
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     id: randomUUID(),
     ownerId: userId,
     name,
-    phone,
+    email,
     createdAt: new Date().toISOString(),
   };
 

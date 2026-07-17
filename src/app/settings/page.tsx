@@ -4,7 +4,7 @@ import { readDb, updateDb } from "@/lib/db";
 import { randomUUID } from "crypto";
 import type { ManagerContact } from "@/lib/types";
 
-const PHONE_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -20,15 +20,15 @@ export default async function SettingsPage() {
   async function addContact(formData: FormData) {
     "use server";
     const name = String(formData.get("name") ?? "").trim();
-    const phone = String(formData.get("phone") ?? "").trim();
-    if (!name || !PHONE_RE.test(phone)) {
+    const email = String(formData.get("email") ?? "").trim();
+    if (!name || !EMAIL_RE.test(email)) {
       redirect("/settings?error=1");
     }
     const contact: ManagerContact = {
       id: randomUUID(),
       ownerId: userId,
       name,
-      phone,
+      email,
       createdAt: new Date().toISOString(),
     };
     await updateDb((db) => {
@@ -56,7 +56,7 @@ export default async function SettingsPage() {
         </a>
         <h1 className="mt-2 text-xl font-bold text-slate-900">담당자 설정</h1>
         <p className="mt-1 text-sm text-slate-500">
-          송신 시 정보를 받을 담당자의 휴대폰번호를 등록하세요.
+          송신 시 정보를 받을 담당자의 이메일 주소를 등록하세요.
         </p>
       </div>
 
@@ -74,12 +74,12 @@ export default async function SettingsPage() {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          휴대폰번호
+          이메일 주소
           <input
-            name="phone"
+            name="email"
+            type="email"
             required
-            placeholder="010-0000-0000"
-            pattern="^01[0-9]-?\d{3,4}-?\d{4}$"
+            placeholder="manager@example.com"
             className="rounded-lg border border-slate-300 px-3 py-2 text-[15px] focus:border-blue-500 focus:outline-none"
           />
         </label>
@@ -104,7 +104,7 @@ export default async function SettingsPage() {
           >
             <div>
               <p className="text-[15px] font-semibold text-slate-800">{c.name}</p>
-              <p className="text-sm text-slate-500">{c.phone}</p>
+              <p className="text-sm text-slate-500">{c.email}</p>
             </div>
             <form action={removeContact}>
               <input type="hidden" name="id" value={c.id} />

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { updateDb } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
-import { sendSms } from "@/lib/sms";
+import { sendEmail } from "@/lib/email";
 import type { ContractProfile, Submission, TaxInvoiceProfile } from "@/lib/types";
 
 type TaxInvoiceInput =
@@ -94,8 +94,8 @@ export async function POST(req: Request) {
       clientName,
       taxInvoice,
       contract,
-      managerPhone: manager.phone,
-      smsStatus: "not_configured",
+      managerEmail: manager.email,
+      emailStatus: "not_configured",
       createdAt: new Date().toISOString(),
     };
     db.submissions.push(submission);
@@ -110,23 +110,27 @@ export async function POST(req: Request) {
 
   const submission = result;
   const message = buildMessage(submission);
-  const smsResult = await sendSms(submission.managerPhone, message);
+  const emailResult = await sendEmail(
+    submission.managerEmail,
+    `[건설기계 대여대금 지급보증서] ${submission.siteName}`,
+    message
+  );
 
   await updateDb((db) => {
     const target = db.submissions.find((s) => s.id === submission.id);
     if (target) {
-      target.smsStatus = smsResult.ok
+      target.emailStatus = emailResult.ok
         ? "sent"
-        : smsResult.reason === "not_configured"
+        : emailResult.reason === "not_configured"
           ? "not_configured"
           : "failed";
-      target.smsDetail = smsResult.detail;
+      target.emailDetail = emailResult.detail;
     }
   });
 
   return NextResponse.json({
     submission,
-    sms: smsResult,
+    email: emailResult,
     message,
   });
 }

@@ -64,7 +64,7 @@ export default function FormClient({
       setOutcome({
         ok: false,
         title: "담당자 미등록",
-        detail: "설정에서 담당자 휴대폰번호를 먼저 등록해 주세요.",
+        detail: "설정에서 담당자 이메일 주소를 먼저 등록해 주세요.",
       });
       return;
     }
@@ -112,24 +112,24 @@ export default function FormClient({
         return;
       }
 
-      if (data.sms.ok) {
+      if (data.email.ok) {
         setOutcome({
           ok: true,
           title: "발송 완료",
-          detail: `담당자(${data.submission.managerPhone})에게 SMS를 발송했습니다.`,
+          detail: `담당자(${data.submission.managerEmail})에게 이메일을 발송했습니다.`,
         });
-      } else if (data.sms.reason === "not_configured") {
+      } else if (data.email.reason === "not_configured") {
         setOutcome({
           ok: false,
-          title: "정보는 저장되었습니다 (SMS 미발송)",
+          title: "정보는 저장되었습니다 (이메일 미발송)",
           detail:
-            "SMS 연동 키가 아직 설정되지 않았습니다. 관리자가 .env.local에 알리고(Aligo) 키를 설정하면 자동 발송됩니다.",
+            "이메일 발송 계정이 아직 설정되지 않았습니다. 관리자가 .env.local에 GMAIL_USER, GMAIL_APP_PASSWORD를 설정하면 자동 발송됩니다.",
         });
       } else {
         setOutcome({
           ok: false,
-          title: "SMS 발송 실패",
-          detail: data.sms.detail ?? "잠시 후 다시 시도해 주세요.",
+          title: "이메일 발송 실패",
+          detail: data.email.detail ?? "잠시 후 다시 시도해 주세요.",
         });
       }
     } catch {
@@ -348,7 +348,7 @@ export default function FormClient({
               >
                 {managerContacts.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} ({c.phone})
+                    {c.name} ({c.email})
                   </option>
                 ))}
               </select>
