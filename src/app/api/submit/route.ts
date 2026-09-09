@@ -29,7 +29,7 @@ function buildMessage(sub: Submission) {
 }
 
 export async function POST(req: Request) {
-  const userId = await requireUserId();
+  const userId = await requireUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }

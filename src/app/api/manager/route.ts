@@ -6,8 +6,8 @@ import type { ManagerContact } from "@/lib/types";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export async function GET() {
-  const userId = await requireUserId();
+export async function GET(req: Request) {
+  const userId = await requireUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
@@ -17,7 +17,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const userId = await requireUserId();
+  const userId = await requireUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const userId = await requireUserId();
+  const userId = await requireUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
