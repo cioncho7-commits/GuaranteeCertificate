@@ -3,6 +3,14 @@
 Kotlin + Jetpack Compose로 만든 네이티브 안드로이드 앱입니다. 로그인/데이터 저장/이메일 발송은
 같은 저장소의 Next.js 웹앱(`../`)이 제공하는 API를 그대로 재사용합니다 (별도 백엔드 없음).
 
+## CI 빌드 (APK 받기)
+
+이 저장소에 `.github/workflows/android-build.yml`이 설정되어 있어, `android/` 폴더에
+변경사항이 푸시될 때마다 GitHub Actions가 자동으로 디버그 APK를 빌드합니다.
+GitHub 저장소의 **Actions 탭 → Android Build → 최근 실행 → Artifacts**에서
+`app-debug` 파일을 내려받아 휴대폰에 설치(사이드로드)하면 Android Studio 없이도
+바로 실행해볼 수 있습니다.
+
 ## ⚠️ 이 코드는 아직 빌드 검증이 안 됐습니다
 
 이 프로젝트는 Android SDK와 Google Maven 저장소(`dl.google.com`)에 접근할 수 없는 개발 환경에서
