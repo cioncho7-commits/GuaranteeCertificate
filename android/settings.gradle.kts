@@ -11,9 +11,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // 네이버 로그인 SDK 저장소. 최신 주소는 네이버 개발자 센터 문서에서 확인하세요.
-        // https://developers.naver.com/docs/login/android/android.md
-        maven { url = uri("https://repository.map.naver.com/archive/naver_id_login") }
+        // 카카오 SDK는 Maven Central이 아니라 카카오 자체 저장소에서 배포됩니다.
+        // https://developers.kakao.com/docs/latest/en/android/getting-started
+        maven { url = uri("https://devrepo.kakao.com/nexus/content/groups/public/") }
     }
 }
 
