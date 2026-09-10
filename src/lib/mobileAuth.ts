@@ -70,17 +70,17 @@ async function verifyKakaoAccessToken(accessToken: string): Promise<MobileUser> 
   });
   if (!res.ok) throw new Error("카카오 토큰 검증에 실패했습니다.");
   const data = (await res.json()) as {
+    id?: number;
     kakao_account?: { email?: string; profile?: { nickname?: string } };
   };
-  const email = data.kakao_account?.email;
-  if (!email) {
-    throw new Error(
-      "카카오 계정에서 이메일 정보를 가져올 수 없습니다. 카카오 로그인 동의항목에서 이메일 제공에 동의했는지 확인하세요."
-    );
-  }
+  if (!data.id) throw new Error("카카오 계정 정보를 가져올 수 없습니다.");
+
+  // 카카오는 이메일 제공에 별도 심사(추가 기능 신청)가 필요해 기본적으로는
+  // 이메일을 받을 수 없습니다. 이메일 대신 카카오 고유 사용자 ID로 식별합니다
+  // (next-auth 웹 로그인도 이메일이 없으면 동일하게 카카오 ID를 사용합니다).
   return {
-    id: email,
-    email,
+    id: String(data.id),
+    email: data.kakao_account?.email ?? "",
     name: data.kakao_account?.profile?.nickname ?? null,
     provider: "kakao",
   };
