@@ -1,10 +1,18 @@
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 import type { Database } from "./types";
 
 // 데모/초기 단계용 파일 기반 저장소.
 // 운영 전환 시 이 모듈만 실제 DB(Prisma 등) 연동으로 교체하면 됩니다.
-const DATA_DIR = path.join(process.cwd(), "data");
+//
+// Vercel 같은 서버리스 환경은 배포된 코드 영역이 읽기 전용이라 process.cwd()
+// 아래에는 쓸 수 없고 /tmp 만 쓰기가 가능합니다. 다만 /tmp는 함수 인스턴스가
+// 재활용되는 동안만 유지되고 콜드 스타트/재배포 시 초기화되므로, 이건 어디까지나
+// 로그인 등 즉시 동작 확인용 임시 조치입니다. 실제 서비스에는 별도 DB가 필요합니다.
+const DATA_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), "guarantee-certificate-data")
+  : path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 
 const EMPTY_DB: Database = {
