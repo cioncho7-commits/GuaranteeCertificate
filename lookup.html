@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보증서 조회 - 보증서 서비스</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">GC</span>
+      <span>보증서 서비스</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">홈</a>
+      <a href="issue.html">발급</a>
+      <a href="lookup.html" class="active">조회</a>
+      <a href="login.html" id="nav-auth">로그인</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="page-header">
+    <h1>보증서 조회</h1>
+    <p>보증서 번호 또는 시리얼번호를 입력해 보증 상태를 확인하세요.</p>
+  </div>
+
+  <section class="card">
+    <form id="lookup-form" class="search-bar">
+      <input type="text" id="query" name="query" placeholder="예: GC-20260909-AB12CD 또는 시리얼번호" required />
+      <button type="submit" class="btn btn-primary">조회하기</button>
+    </form>
+  </section>
+
+  <section class="card" id="result-card" hidden>
+    <div class="certificate">
+      <div class="certificate-head">
+        <div>
+          <h2>제품 보증서</h2>
+          <div class="certificate-id">보증서 번호: <span id="res-id"></span></div>
+        </div>
+        <span class="badge" id="res-badge"></span>
+      </div>
+      <dl class="certificate-grid">
+        <div>
+          <dt>제품명</dt>
+          <dd id="res-product"></dd>
+        </div>
+        <div>
+          <dt>시리얼번호</dt>
+          <dd id="res-serial"></dd>
+        </div>
+        <div>
+          <dt>구매자</dt>
+          <dd id="res-buyer"></dd>
+        </div>
+        <div>
+          <dt>판매처</dt>
+          <dd id="res-seller"></dd>
+        </div>
+        <div>
+          <dt>구매일자</dt>
+          <dd id="res-purchase"></dd>
+        </div>
+        <div>
+          <dt>보증기간</dt>
+          <dd id="res-period"></dd>
+        </div>
+        <div>
+          <dt>보증 만료일</dt>
+          <dd id="res-expiry"></dd>
+        </div>
+      </dl>
+    </div>
+    <div class="result-actions no-print">
+      <button class="btn btn-primary" id="print-btn">인쇄하기</button>
+    </div>
+  </section>
+
+  <section class="card empty-state" id="not-found-state" hidden>
+    <div class="icon">🔎</div>
+    <p>해당 번호로 등록된 보증서를 찾을 수 없습니다.<br />번호를 다시 확인해 주세요.</p>
+  </section>
+
+  <section class="card empty-state" id="empty-state">
+    <div class="icon">📄</div>
+    <p>보증서 번호 또는 시리얼번호를 입력하면 결과가 여기에 표시됩니다.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">© 2026 보증서 서비스</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/lookup.js"></script>
+</body>
+</html>

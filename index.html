@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보증서 서비스</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">GC</span>
+      <span>보증서 서비스</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">홈</a>
+      <a href="issue.html">발급</a>
+      <a href="lookup.html">조회</a>
+      <a href="login.html" id="nav-auth">로그인</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <h1>제품 보증서를 간편하게<br />발급하고 조회하세요</h1>
+      <p>구매 정보를 입력하면 즉시 보증서가 발급됩니다. 보증서 번호나 시리얼번호로 언제든 보증 상태를 확인할 수 있습니다.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="issue.html">보증서 발급하기</a>
+        <a class="btn btn-secondary" href="lookup.html">보증서 조회하기</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="features">
+      <div class="feature-card">
+        <div class="icon">📝</div>
+        <h3>간편한 발급</h3>
+        <p>제품 정보와 구매 정보만 입력하면 고유 번호가 부여된 보증서가 바로 만들어집니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔍</div>
+        <h3>빠른 조회</h3>
+        <p>보증서 번호 또는 시리얼번호만으로 보증 기간과 만료 여부를 즉시 확인할 수 있습니다.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🖨️</div>
+        <h3>출력 및 보관</h3>
+        <p>발급된 보증서는 인쇄하거나 화면으로 저장해 필요할 때 제시할 수 있습니다.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">© 2026 보증서 서비스</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth-nav.js"></script>
+</body>
+</html>

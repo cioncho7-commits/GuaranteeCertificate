@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보증서 발급 - 보증서 서비스</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">GC</span>
+      <span>보증서 서비스</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">홈</a>
+      <a href="issue.html" class="active">발급</a>
+      <a href="lookup.html">조회</a>
+      <a href="login.html" id="nav-auth">로그인</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="page-header">
+    <h1>보증서 발급</h1>
+    <p>제품 정보와 구매 정보를 입력하면 보증서가 즉시 발급됩니다.</p>
+  </div>
+
+  <div class="auth-gate" id="auth-gate">로그인 확인 중...</div>
+
+  <section class="card" id="form-card" hidden>
+    <div class="user-bar">
+      <span id="issuer-info"></span>
+    </div>
+    <form id="issue-form" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="productName">제품명 *</label>
+          <input type="text" id="productName" name="productName" placeholder="예: 무선 청소기" required />
+        </div>
+        <div class="field">
+          <label for="model">모델명</label>
+          <input type="text" id="model" name="model" placeholder="예: GC-2000" />
+        </div>
+        <div class="field">
+          <label for="serial">시리얼번호 *</label>
+          <input type="text" id="serial" name="serial" placeholder="제품 시리얼번호" required />
+        </div>
+        <div class="field">
+          <label for="warrantyMonths">보증기간(개월) *</label>
+          <input type="number" id="warrantyMonths" name="warrantyMonths" min="1" value="12" required />
+        </div>
+        <div class="field">
+          <label for="buyerName">구매자명 *</label>
+          <input type="text" id="buyerName" name="buyerName" placeholder="구매자 이름" required />
+        </div>
+        <div class="field">
+          <label for="buyerContact">구매자 연락처</label>
+          <input type="text" id="buyerContact" name="buyerContact" placeholder="010-0000-0000" />
+        </div>
+        <div class="field">
+          <label for="purchaseDate">구매일자 *</label>
+          <input type="date" id="purchaseDate" name="purchaseDate" required />
+        </div>
+        <div class="field">
+          <label for="seller">판매처</label>
+          <input type="text" id="seller" name="seller" placeholder="구매처 이름" />
+        </div>
+      </div>
+      <div class="form-error" id="form-error"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">보증서 발급하기</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" id="result-card" hidden>
+    <div class="certificate">
+      <div class="certificate-head">
+        <div>
+          <h2>제품 보증서</h2>
+          <div class="certificate-id">보증서 번호: <span id="res-id"></span></div>
+        </div>
+        <span class="badge badge-valid">발급 완료</span>
+      </div>
+      <dl class="certificate-grid">
+        <div>
+          <dt>제품명</dt>
+          <dd id="res-product"></dd>
+        </div>
+        <div>
+          <dt>시리얼번호</dt>
+          <dd id="res-serial"></dd>
+        </div>
+        <div>
+          <dt>구매자</dt>
+          <dd id="res-buyer"></dd>
+        </div>
+        <div>
+          <dt>판매처</dt>
+          <dd id="res-seller"></dd>
+        </div>
+        <div>
+          <dt>구매일자</dt>
+          <dd id="res-purchase"></dd>
+        </div>
+        <div>
+          <dt>보증기간</dt>
+          <dd id="res-period"></dd>
+        </div>
+        <div>
+          <dt>보증 만료일</dt>
+          <dd id="res-expiry"></dd>
+        </div>
+      </dl>
+    </div>
+    <div class="result-actions no-print">
+      <button class="btn btn-primary" id="print-btn">인쇄하기</button>
+      <button class="btn btn-secondary" id="new-issue-btn">새 보증서 발급</button>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">© 2026 보증서 서비스</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/issue.js"></script>
+</body>
+</html>

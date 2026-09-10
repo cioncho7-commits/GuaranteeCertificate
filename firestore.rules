@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /certificates/{certId} {
+      // 조회 페이지는 누구나 볼 수 있어야 하므로 읽기는 공개
+      allow read: if true;
+      // 발급은 로그인한 사용자만 가능
+      allow create: if request.auth != null;
+      // 발급된 보증서는 수정/삭제 불가 (위변조 방지)
+      allow update, delete: if false;
+    }
+  }
+}
