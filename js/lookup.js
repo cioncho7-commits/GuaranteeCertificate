@@ -6,23 +6,35 @@
   const resultCard = document.getElementById("result-card");
   const emptyState = document.getElementById("empty-state");
   const notFoundState = document.getElementById("not-found-state");
+  const notFoundText = notFoundState.querySelector("p");
   const printBtn = document.getElementById("print-btn");
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const cert = findById(input.value);
 
     resultCard.hidden = true;
     emptyState.hidden = true;
     notFoundState.hidden = true;
 
-    if (!cert) {
-      notFoundState.hidden = false;
-      return;
-    }
+    const submitBtn = form.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
 
-    renderResult(cert);
-    resultCard.hidden = false;
+    try {
+      const cert = await findById(input.value);
+      if (!cert) {
+        notFoundText.textContent =
+          "해당 번호로 등록된 보증서를 찾을 수 없습니다. 번호를 다시 확인해 주세요.";
+        notFoundState.hidden = false;
+        return;
+      }
+      renderResult(cert);
+      resultCard.hidden = false;
+    } catch (err) {
+      notFoundText.textContent = "조회 중 오류가 발생했습니다: " + err.message;
+      notFoundState.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 
   function renderResult(cert) {

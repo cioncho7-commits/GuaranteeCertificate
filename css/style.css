@@ -396,6 +396,55 @@ img {
   display: none !important;
 }
 
+/* Auth */
+.auth-card {
+  max-width: 420px;
+  margin: 40px auto 64px;
+}
+
+.auth-card h1 {
+  font-size: 22px;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.auth-toggle-row {
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.auth-toggle-row button {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  font-size: 14px;
+}
+
+.user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.auth-gate {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--color-text-muted);
+}
+
 /* Footer */
 .site-footer {
   border-top: 1px solid var(--color-border);

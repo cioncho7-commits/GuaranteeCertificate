@@ -1,32 +1,35 @@
-// 보증서 데이터 저장/조회 (localStorage 기반)
-// 추후 웹앱/서버 연동 시 이 모듈의 함수 시그니처만 유지하면 교체가 쉽습니다.
+// 보증서 데이터 저장/조회 (Firebase Firestore 기반)
 window.GC = window.GC || {};
 
 (function () {
-  const STORAGE_KEY = "gc_certificates";
+  const COLLECTION = "certificates";
 
-  function getAll() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    } catch (e) {
-      return [];
+  function db() {
+    if (!window.GC.db) {
+      throw new Error("Firebase가 초기화되지 않았습니다. js/firebase-config.js 설정을 확인하세요.");
     }
+    return window.GC.db;
   }
 
-  function save(cert) {
-    const list = getAll();
-    list.push(cert);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  async function save(cert) {
+    await db().collection(COLLECTION).doc(cert.id).set(cert);
   }
 
-  function findById(query) {
-    const q = String(query || "").trim().toLowerCase();
+  async function findById(query) {
+    const q = String(query || "").trim();
     if (!q) return null;
-    return (
-      getAll().find(
-        (c) => c.id.toLowerCase() === q || c.serial.toLowerCase() === q
-      ) || null
-    );
+
+    const byId = await db().collection(COLLECTION).doc(q.toUpperCase()).get();
+    if (byId.exists) return byId.data();
+
+    const bySerial = await db()
+      .collection(COLLECTION)
+      .where("serialLower", "==", q.toLowerCase())
+      .limit(1)
+      .get();
+    if (!bySerial.empty) return bySerial.docs[0].data();
+
+    return null;
   }
 
   function generateId() {
@@ -65,7 +68,6 @@ window.GC = window.GC || {};
   }
 
   window.GC.storage = {
-    getAll,
     save,
     findById,
     generateId,

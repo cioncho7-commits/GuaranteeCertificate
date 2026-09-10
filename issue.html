@@ -17,6 +17,7 @@
       <a href="index.html">홈</a>
       <a href="issue.html" class="active">발급</a>
       <a href="lookup.html">조회</a>
+      <a href="login.html" id="nav-auth">로그인</a>
     </nav>
   </div>
 </header>
@@ -27,7 +28,12 @@
     <p>제품 정보와 구매 정보를 입력하면 보증서가 즉시 발급됩니다.</p>
   </div>
 
-  <section class="card" id="form-card">
+  <div class="auth-gate" id="auth-gate">로그인 확인 중...</div>
+
+  <section class="card" id="form-card" hidden>
+    <div class="user-bar">
+      <span id="issuer-info"></span>
+    </div>
     <form id="issue-form" novalidate>
       <div class="form-grid">
         <div class="field">
@@ -121,6 +127,12 @@
   <div class="container">© 2026 보증서 서비스</div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth-nav.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/issue.js"></script>
 </body>
