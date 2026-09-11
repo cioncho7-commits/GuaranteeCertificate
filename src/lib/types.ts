@@ -62,9 +62,9 @@ export type Report = {
   ownerId: string;
   type: ReportType;
   siteName: string; // 현장명
-  targetCompanyName: string; // 신고 대상 업체명 (원청/하도급업체 등)
-  reporterName: string;
-  reporterPhone: string;
+  mainContractorName: string; // 원청명
+  partnerCompanyName: string; // 협력사명
+  resubcontractorName?: string; // 재하도급업자 (불법하도급신고에서만 사용)
   description: string; // 신고 내용
   attachmentUrl?: string; // 증빙자료 사진/PDF
   attachmentName?: string;

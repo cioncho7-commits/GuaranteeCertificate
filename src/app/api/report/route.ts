@@ -14,12 +14,13 @@ function buildMessage(report: Report) {
   const lines = [
     `[${TITLES[report.type]}]`,
     `현장명: ${report.siteName}`,
-    `신고 대상 업체명: ${report.targetCompanyName}`,
-    `신고인: ${report.reporterName} (${report.reporterPhone})`,
-    "",
-    "신고 내용:",
-    report.description,
+    `원청명: ${report.mainContractorName}`,
+    `협력사명: ${report.partnerCompanyName}`,
   ];
+  if (report.type === "subcontract") {
+    lines.push(`재하도급업자: ${report.resubcontractorName}`);
+  }
+  lines.push("", "신고 내용:", report.description);
   if (report.attachmentUrl) {
     lines.push("", `증빙자료: ${report.attachmentUrl}`);
   }
@@ -35,9 +36,9 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const type = body?.type as ReportType | undefined;
   const siteName = String(body?.siteName ?? "").trim();
-  const targetCompanyName = String(body?.targetCompanyName ?? "").trim();
-  const reporterName = String(body?.reporterName ?? "").trim();
-  const reporterPhone = String(body?.reporterPhone ?? "").trim();
+  const mainContractorName = String(body?.mainContractorName ?? "").trim();
+  const partnerCompanyName = String(body?.partnerCompanyName ?? "").trim();
+  const resubcontractorName = String(body?.resubcontractorName ?? "").trim();
   const description = String(body?.description ?? "").trim();
   const attachmentUrl = body?.attachmentUrl ? String(body.attachmentUrl) : undefined;
   const attachmentName = body?.attachmentName ? String(body.attachmentName) : undefined;
@@ -46,15 +47,11 @@ export async function POST(req: Request) {
   if (!type || !TITLES[type]) {
     return NextResponse.json({ error: "신고 종류가 올바르지 않습니다." }, { status: 400 });
   }
-  if (
-    !siteName ||
-    !targetCompanyName ||
-    !reporterName ||
-    !reporterPhone ||
-    !description ||
-    !managerContactId
-  ) {
+  if (!siteName || !mainContractorName || !partnerCompanyName || !description || !managerContactId) {
     return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
+  }
+  if (type === "subcontract" && !resubcontractorName) {
+    return NextResponse.json({ error: "재하도급업자를 입력하세요." }, { status: 400 });
   }
 
   const result = await updateDb((db) => {
@@ -70,9 +67,9 @@ export async function POST(req: Request) {
       ownerId: userId,
       type,
       siteName,
-      targetCompanyName,
-      reporterName,
-      reporterPhone,
+      mainContractorName,
+      partnerCompanyName,
+      resubcontractorName: type === "subcontract" ? resubcontractorName : undefined,
       description,
       attachmentUrl,
       attachmentName,

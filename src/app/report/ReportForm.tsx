@@ -6,9 +6,7 @@ import type { ManagerContact, ReportType } from "@/lib/types";
 type Props = {
   type: ReportType;
   title: string;
-  companyLabel: string;
-  descriptionLabel: string;
-  descriptionPlaceholder: string;
+  showResubcontractor: boolean;
   managerContacts: ManagerContact[];
 };
 
@@ -19,15 +17,13 @@ type Outcome = { ok: boolean; title: string; detail: string };
 export default function ReportForm({
   type,
   title,
-  companyLabel,
-  descriptionLabel,
-  descriptionPlaceholder,
+  showResubcontractor,
   managerContacts,
 }: Props) {
   const [siteName, setSiteName] = useState("");
-  const [targetCompanyName, setTargetCompanyName] = useState("");
-  const [reporterName, setReporterName] = useState("");
-  const [reporterPhone, setReporterPhone] = useState("");
+  const [mainContractorName, setMainContractorName] = useState("");
+  const [partnerCompanyName, setPartnerCompanyName] = useState("");
+  const [resubcontractorName, setResubcontractorName] = useState("");
   const [description, setDescription] = useState("");
   const [attachment, setAttachment] = useState<Attachment>(null);
   const [uploading, setUploading] = useState(false);
@@ -79,9 +75,9 @@ export default function ReportForm({
         body: JSON.stringify({
           type,
           siteName,
-          targetCompanyName,
-          reporterName,
-          reporterPhone,
+          mainContractorName,
+          partnerCompanyName,
+          resubcontractorName: showResubcontractor ? resubcontractorName : undefined,
           description,
           attachmentUrl: attachment?.url,
           attachmentName: attachment?.name,
@@ -102,9 +98,9 @@ export default function ReportForm({
           detail: `담당자(${data.report.managerEmail})에게 신고 내용을 발송했습니다.`,
         });
         setSiteName("");
-        setTargetCompanyName("");
-        setReporterName("");
-        setReporterPhone("");
+        setMainContractorName("");
+        setPartnerCompanyName("");
+        setResubcontractorName("");
         setDescription("");
         setAttachment(null);
       } else if (data.email.reason === "not_configured") {
@@ -145,46 +141,45 @@ export default function ReportForm({
               className={inputCls}
             />
           </Field>
-          <Field label={companyLabel}>
+          <Field label="원청명">
             <input
               required
-              value={targetCompanyName}
-              onChange={(e) => setTargetCompanyName(e.target.value)}
+              value={mainContractorName}
+              onChange={(e) => setMainContractorName(e.target.value)}
               className={inputCls}
             />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="신고인 이름">
+          <Field label="협력사명">
+            <input
+              required
+              value={partnerCompanyName}
+              onChange={(e) => setPartnerCompanyName(e.target.value)}
+              className={inputCls}
+            />
+          </Field>
+          {showResubcontractor && (
+            <Field label="재하도급업자">
               <input
                 required
-                value={reporterName}
-                onChange={(e) => setReporterName(e.target.value)}
+                value={resubcontractorName}
+                onChange={(e) => setResubcontractorName(e.target.value)}
                 className={inputCls}
               />
             </Field>
-            <Field label="신고인 연락처">
-              <input
-                required
-                value={reporterPhone}
-                onChange={(e) => setReporterPhone(e.target.value)}
-                placeholder="010-0000-0000"
-                className={inputCls}
-              />
-            </Field>
-          </div>
-          <Field label={descriptionLabel}>
+          )}
+          <Field label="내용설명">
             <textarea
               required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={descriptionPlaceholder}
+              placeholder="신고 경위와 정황을 자세히 적어주세요."
               rows={6}
               className={`${inputCls} resize-none`}
             />
           </Field>
 
           <div className="flex flex-col gap-1 text-sm font-medium text-slate-600">
-            <span>증빙자료 첨부 (사진/PDF, 선택)</span>
+            <span>증거자료 첨부 (사진/PDF, 선택)</span>
             {attachment ? (
               <div className="flex items-center justify-between rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-[15px]">
                 <a
