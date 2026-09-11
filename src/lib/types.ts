@@ -54,10 +54,31 @@ export type Submission = {
   createdAt: string;
 };
 
+export type ReportType = "subcontract" | "no_contract";
+
+// 불법하도급신고 / 계약서미작성신고
+export type Report = {
+  id: string;
+  ownerId: string;
+  type: ReportType;
+  siteName: string; // 현장명
+  targetCompanyName: string; // 신고 대상 업체명 (원청/하도급업체 등)
+  reporterName: string;
+  reporterPhone: string;
+  description: string; // 신고 내용
+  attachmentUrl?: string; // 증빙자료 사진/PDF
+  attachmentName?: string;
+  managerEmail: string;
+  emailStatus: "sent" | "failed" | "not_configured";
+  emailDetail?: string;
+  createdAt: string;
+};
+
 export type Database = {
   consents: ConsentRecord[];
   taxInvoiceProfiles: TaxInvoiceProfile[];
   contractProfiles: ContractProfile[];
   managerContacts: ManagerContact[];
   submissions: Submission[];
+  reports: Report[];
 };

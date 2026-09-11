@@ -190,6 +190,9 @@ export default function FormClient({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-5 py-6">
+      <a href="/menu" className="text-sm text-blue-700 underline underline-offset-2">
+        ← 메뉴로
+      </a>
       <header className="flex items-center justify-between">
         <div>
           <p className="text-xs text-slate-400">{userName}님</p>

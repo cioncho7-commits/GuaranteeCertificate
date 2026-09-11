@@ -14,6 +14,7 @@ const EMPTY_DB: Database = {
   contractProfiles: [],
   managerContacts: [],
   submissions: [],
+  reports: [],
 };
 
 const REDIS_KEY = "guarantee-certificate:db";

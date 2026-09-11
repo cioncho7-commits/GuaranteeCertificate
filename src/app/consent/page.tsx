@@ -12,7 +12,7 @@ export default async function ConsentPage() {
     (session.user as { id?: string }).id ?? session.user.email ?? "";
   const existing = await getConsent(userId);
   if (existing?.requiredAgreed) {
-    redirect("/form");
+    redirect("/menu");
   }
 
   async function agree(formData: FormData) {
@@ -23,7 +23,7 @@ export default async function ConsentPage() {
       redirect("/consent");
     }
     await saveConsent(userId, required, marketing);
-    redirect("/form");
+    redirect("/menu");
   }
 
   return (

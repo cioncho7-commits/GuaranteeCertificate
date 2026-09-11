@@ -10,7 +10,7 @@ export default async function HomePage() {
   if (session?.user) {
     const userId = (session.user as { id?: string }).id ?? session.user.email ?? "";
     const consent = await getConsent(userId);
-    redirect(consent?.requiredAgreed ? "/form" : "/consent");
+    redirect(consent?.requiredAgreed ? "/menu" : "/consent");
   }
 
   return (
