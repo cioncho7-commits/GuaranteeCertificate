@@ -16,6 +16,8 @@ type SubmitOutcome = {
   detail: string;
 };
 
+type Attachment = { url: string; name: string } | null;
+
 export default function FormClient({
   userName,
   taxInvoiceProfiles,
@@ -37,6 +39,9 @@ export default function FormClient({
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [businessRegNumber, setBusinessRegNumber] = useState("");
   const [repPhone, setRepPhone] = useState("");
+  const [taxAttachment, setTaxAttachment] = useState<Attachment>(null);
+  const [taxUploading, setTaxUploading] = useState(false);
+  const [taxUploadError, setTaxUploadError] = useState<string | null>(null);
 
   const [contractMode, setContractMode] = useState<"select" | "new">(
     contractProfiles.length > 0 ? "select" : "new"
@@ -48,6 +53,9 @@ export default function FormClient({
   const [periodEnd, setPeriodEnd] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [paymentDueTerms, setPaymentDueTerms] = useState("");
+  const [contractAttachment, setContractAttachment] = useState<Attachment>(null);
+  const [contractUploading, setContractUploading] = useState(false);
+  const [contractUploadError, setContractUploadError] = useState<string | null>(null);
 
   const [managerContactId, setManagerContactId] = useState(
     managerContacts[0]?.id ?? ""
@@ -55,6 +63,34 @@ export default function FormClient({
 
   const [submitting, setSubmitting] = useState(false);
   const [outcome, setOutcome] = useState<SubmitOutcome | null>(null);
+
+  async function uploadFile(
+    file: File,
+    setUploading: (v: boolean) => void,
+    setError: (v: string | null) => void,
+    setAttachment: (v: Attachment) => void
+  ) {
+    setUploading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "업로드에 실패했습니다.");
+        return;
+      }
+      setAttachment({ url: data.url, name: data.name });
+    } catch {
+      setError("네트워크 오류로 업로드하지 못했습니다.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const selectedTaxProfile = taxInvoiceProfiles.find((p) => p.id === selectedTaxId);
+  const selectedContractProfile = contractProfiles.find((p) => p.id === selectedContractId);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -81,6 +117,8 @@ export default function FormClient({
               vehicleNumber,
               businessRegNumber,
               repPhone,
+              attachmentUrl: taxAttachment?.url,
+              attachmentName: taxAttachment?.name,
             },
           };
 
@@ -89,7 +127,14 @@ export default function FormClient({
         ? { mode: "existing" as const, id: selectedContractId }
         : {
             mode: "new" as const,
-            data: { periodStart, periodEnd, unitPrice, paymentDueTerms },
+            data: {
+              periodStart,
+              periodEnd,
+              unitPrice,
+              paymentDueTerms,
+              attachmentUrl: contractAttachment?.url,
+              attachmentName: contractAttachment?.name,
+            },
           };
 
     setSubmitting(true);
@@ -192,19 +237,22 @@ export default function FormClient({
           />
 
           {taxMode === "select" ? (
-            <Field label="등록된 세금계산서 정보">
-              <select
-                value={selectedTaxId}
-                onChange={(e) => setSelectedTaxId(e.target.value)}
-                className={inputCls}
-              >
-                {taxInvoiceProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.lessorCompanyName} / {p.vehicleNumber} (임차인 {p.lesseeName})
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <>
+              <Field label="등록된 세금계산서 정보">
+                <select
+                  value={selectedTaxId}
+                  onChange={(e) => setSelectedTaxId(e.target.value)}
+                  className={inputCls}
+                >
+                  {taxInvoiceProfiles.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.lessorCompanyName} / {p.vehicleNumber} (임차인 {p.lesseeName})
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <AttachmentPreview attachment={selectedTaxProfile?.attachmentUrl ? { url: selectedTaxProfile.attachmentUrl, name: selectedTaxProfile.attachmentName ?? "첨부파일" } : null} />
+            </>
           ) : (
             <>
               <Field label="건설기계임차인명">
@@ -259,6 +307,16 @@ export default function FormClient({
                   className={inputCls}
                 />
               </Field>
+              <FileAttachmentField
+                label="세금계산서 첨부 (사진/PDF, 선택)"
+                attachment={taxAttachment}
+                uploading={taxUploading}
+                error={taxUploadError}
+                onSelect={(file) =>
+                  uploadFile(file, setTaxUploading, setTaxUploadError, setTaxAttachment)
+                }
+                onRemove={() => setTaxAttachment(null)}
+              />
             </>
           )}
         </Section>
@@ -273,19 +331,22 @@ export default function FormClient({
           />
 
           {contractMode === "select" ? (
-            <Field label="등록된 계약서">
-              <select
-                value={selectedContractId}
-                onChange={(e) => setSelectedContractId(e.target.value)}
-                className={inputCls}
-              >
-                {contractProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.periodStart} ~ {p.periodEnd} / 단가 {p.unitPrice}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <>
+              <Field label="등록된 계약서">
+                <select
+                  value={selectedContractId}
+                  onChange={(e) => setSelectedContractId(e.target.value)}
+                  className={inputCls}
+                >
+                  {contractProfiles.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.periodStart} ~ {p.periodEnd} / 단가 {p.unitPrice}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <AttachmentPreview attachment={selectedContractProfile?.attachmentUrl ? { url: selectedContractProfile.attachmentUrl, name: selectedContractProfile.attachmentName ?? "첨부파일" } : null} />
+            </>
           ) : (
             <>
               <div className="grid grid-cols-2 gap-3">
@@ -326,6 +387,16 @@ export default function FormClient({
                   className={inputCls}
                 />
               </Field>
+              <FileAttachmentField
+                label="계약서 첨부 (사진/PDF, 선택)"
+                attachment={contractAttachment}
+                uploading={contractUploading}
+                error={contractUploadError}
+                onSelect={(file) =>
+                  uploadFile(file, setContractUploading, setContractUploadError, setContractAttachment)
+                }
+                onRemove={() => setContractAttachment(null)}
+              />
             </>
           )}
         </Section>
@@ -371,7 +442,7 @@ export default function FormClient({
 
         <button
           type="submit"
-          disabled={submitting || managerContacts.length === 0}
+          disabled={submitting || taxUploading || contractUploading || managerContacts.length === 0}
           className="rounded-xl bg-blue-700 px-4 py-3.5 text-[16px] font-bold text-white shadow-sm transition hover:bg-blue-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           {submitting ? "송신 중..." : "송신"}
@@ -439,5 +510,74 @@ function ModeToggle({
         {newLabel}
       </button>
     </div>
+  );
+}
+
+function FileAttachmentField({
+  label,
+  attachment,
+  uploading,
+  error,
+  onSelect,
+  onRemove,
+}: {
+  label: string;
+  attachment: Attachment;
+  uploading: boolean;
+  error: string | null;
+  onSelect: (file: File) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1 text-sm font-medium text-slate-600">
+      <span>{label}</span>
+      {attachment ? (
+        <div className="flex items-center justify-between rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-[15px]">
+          <a
+            href={attachment.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate text-blue-700 underline underline-offset-2"
+          >
+            {attachment.name}
+          </a>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="ml-2 shrink-0 text-slate-400 hover:text-red-600"
+          >
+            삭제
+          </button>
+        </div>
+      ) : (
+        <input
+          type="file"
+          accept="image/*,.pdf"
+          disabled={uploading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onSelect(file);
+            e.target.value = "";
+          }}
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-[14px] text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-blue-700"
+        />
+      )}
+      {uploading && <p className="text-xs text-slate-400">업로드 중...</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+function AttachmentPreview({ attachment }: { attachment: Attachment }) {
+  if (!attachment) return null;
+  return (
+    <a
+      href={attachment.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1 text-sm text-blue-700 underline underline-offset-2"
+    >
+      첨부파일: {attachment.name}
+    </a>
   );
 }

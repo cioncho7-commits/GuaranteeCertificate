@@ -15,6 +15,8 @@ export type TaxInvoiceProfile = {
   vehicleNumber: string; // 차량번호
   businessRegNumber: string; // 사업자등록번호
   repPhone: string; // 대표자 휴대폰번호
+  attachmentUrl?: string; // 첨부한 세금계산서 사진/PDF
+  attachmentName?: string;
   createdAt: string;
 };
 
@@ -26,6 +28,8 @@ export type ContractProfile = {
   periodEnd: string; // 계약기간 종료일
   unitPrice: string; // 단가
   paymentDueTerms: string; // 결제기한
+  attachmentUrl?: string; // 첨부한 계약서 사진/PDF
+  attachmentName?: string;
   createdAt: string;
 };
 

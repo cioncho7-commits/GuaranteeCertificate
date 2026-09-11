@@ -15,7 +15,7 @@ type ContractInput =
 
 function buildMessage(sub: Submission) {
   const { taxInvoice: t, contract: c } = sub;
-  return [
+  const lines = [
     "[건설기계 대여대금 지급보증서]",
     `현장명: ${sub.siteName}`,
     `원청명: ${sub.clientName}`,
@@ -25,7 +25,14 @@ function buildMessage(sub: Submission) {
     `계약기간: ${c.periodStart} ~ ${c.periodEnd}`,
     `단가: ${c.unitPrice}`,
     `결제기한: ${c.paymentDueTerms}`,
-  ].join("\n");
+  ];
+  if (t.attachmentUrl) {
+    lines.push(`세금계산서 첨부파일: ${t.attachmentUrl}`);
+  }
+  if (c.attachmentUrl) {
+    lines.push(`계약서 첨부파일: ${c.attachmentUrl}`);
+  }
+  return lines.join("\n");
 }
 
 export async function POST(req: Request) {
