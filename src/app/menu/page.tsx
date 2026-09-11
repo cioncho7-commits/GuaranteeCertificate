@@ -38,6 +38,11 @@ export default async function MenuPage() {
       title: "보증보험 가입요청",
       desc: "건설기계 대여대금 지급보증서 발급을 신청합니다",
     },
+    {
+      href: "/report/other",
+      title: "기타 신고",
+      desc: "그 외 신고하실 내용을 자유롭게 접수합니다",
+    },
   ];
 
   return (

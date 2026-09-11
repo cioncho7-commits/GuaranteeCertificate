@@ -8,9 +8,18 @@ import type { Report, ReportType } from "@/lib/types";
 const TITLES: Record<ReportType, string> = {
   subcontract: "불법하도급 신고",
   no_contract: "계약서 미작성 신고",
+  other: "기타 신고",
 };
 
 function buildMessage(report: Report) {
+  if (report.type === "other") {
+    const lines = [`[${TITLES[report.type]}] ${report.title}`, "", report.description];
+    if (report.attachmentUrl) {
+      lines.push("", `첨부파일: ${report.attachmentUrl}`);
+    }
+    return lines.join("\n");
+  }
+
   const lines = [
     `[${TITLES[report.type]}]`,
     `현장명: ${report.siteName}`,
@@ -35,10 +44,6 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null);
   const type = body?.type as ReportType | undefined;
-  const siteName = String(body?.siteName ?? "").trim();
-  const mainContractorName = String(body?.mainContractorName ?? "").trim();
-  const partnerCompanyName = String(body?.partnerCompanyName ?? "").trim();
-  const resubcontractorName = String(body?.resubcontractorName ?? "").trim();
   const description = String(body?.description ?? "").trim();
   const attachmentUrl = body?.attachmentUrl ? String(body.attachmentUrl) : undefined;
   const attachmentName = body?.attachmentName ? String(body.attachmentName) : undefined;
@@ -47,11 +52,34 @@ export async function POST(req: Request) {
   if (!type || !TITLES[type]) {
     return NextResponse.json({ error: "신고 종류가 올바르지 않습니다." }, { status: 400 });
   }
-  if (!siteName || !mainContractorName || !partnerCompanyName || !description || !managerContactId) {
+  if (!description || !managerContactId) {
     return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
   }
-  if (type === "subcontract" && !resubcontractorName) {
-    return NextResponse.json({ error: "재하도급업자를 입력하세요." }, { status: 400 });
+
+  let siteName: string | undefined;
+  let mainContractorName: string | undefined;
+  let partnerCompanyName: string | undefined;
+  let resubcontractorName: string | undefined;
+  let title: string | undefined;
+
+  if (type === "other") {
+    title = String(body?.title ?? "").trim();
+    if (!title) {
+      return NextResponse.json({ error: "제목을 입력하세요." }, { status: 400 });
+    }
+  } else {
+    siteName = String(body?.siteName ?? "").trim();
+    mainContractorName = String(body?.mainContractorName ?? "").trim();
+    partnerCompanyName = String(body?.partnerCompanyName ?? "").trim();
+    if (!siteName || !mainContractorName || !partnerCompanyName) {
+      return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
+    }
+    if (type === "subcontract") {
+      resubcontractorName = String(body?.resubcontractorName ?? "").trim();
+      if (!resubcontractorName) {
+        return NextResponse.json({ error: "재하도급업자를 입력하세요." }, { status: 400 });
+      }
+    }
   }
 
   const result = await updateDb((db) => {
@@ -69,7 +97,8 @@ export async function POST(req: Request) {
       siteName,
       mainContractorName,
       partnerCompanyName,
-      resubcontractorName: type === "subcontract" ? resubcontractorName : undefined,
+      resubcontractorName,
+      title,
       description,
       attachmentUrl,
       attachmentName,
@@ -89,7 +118,9 @@ export async function POST(req: Request) {
   const message = buildMessage(report);
   const emailResult = await sendEmail(
     report.managerEmail,
-    `[${TITLES[report.type]}] ${report.siteName}`,
+    type === "other"
+      ? `[${TITLES[report.type]}] ${report.title}`
+      : `[${TITLES[report.type]}] ${report.siteName}`,
     message
   );
 
