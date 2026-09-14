@@ -2,8 +2,18 @@
 
 건설기계 임대차 현장 정보를 등록하고, 담당자에게 이메일로 즉시 전달하는 Next.js 웹앱입니다.
 
-같은 저장소의 [`android/`](./android) 폴더에는 이 웹앱의 API를 그대로 재사용하는 Kotlin
-네이티브 안드로이드 앱이 있습니다 (자세한 내용은 `android/README.md` 참고).
+같은 저장소의 [`android/`](./android) 폴더에는 [Capacitor](https://capacitorjs.com/)로
+이 웹앱을 그대로 감싼 안드로이드 프로젝트가 있습니다. 별도 네이티브 UI/로직 없이
+배포된 웹앱(`capacitor.config.ts`의 `server.url`)을 그대로 띄우는 방식입니다.
+
+```bash
+npm install
+npx cap sync android   # www/, capacitor.config.ts 변경 후 android 프로젝트에 반영
+```
+
+APK는 GitHub Actions(`.github/workflows/android-build.yml`)에서 자동 빌드되며,
+Actions 탭의 워크플로 실행 결과에서 `app-debug` 아티팩트로 다운로드할 수 있습니다.
+빌드 전 `capacitor.config.ts`의 `PRODUCTION_URL`을 실제 배포 주소로 채워야 합니다.
 
 ## 화면 구성
 
