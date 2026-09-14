@@ -38,6 +38,8 @@ export async function POST(req: Request) {
     periodEnd: body.periodEnd,
     unitPrice: body.unitPrice,
     paymentDueTerms: body.paymentDueTerms,
+    attachmentUrl: body.attachmentUrl ? String(body.attachmentUrl) : undefined,
+    attachmentName: body.attachmentName ? String(body.attachmentName) : undefined,
     createdAt: new Date().toISOString(),
   };
 

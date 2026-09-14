@@ -27,11 +27,12 @@ export default function FormClient({
   const [siteName, setSiteName] = useState("");
   const [clientName, setClientName] = useState("");
 
+  const [taxProfiles, setTaxProfiles] = useState(taxInvoiceProfiles);
   const [taxMode, setTaxMode] = useState<"select" | "new">(
-    taxInvoiceProfiles.length > 0 ? "select" : "new"
+    taxProfiles.length > 0 ? "select" : "new"
   );
   const [selectedTaxId, setSelectedTaxId] = useState(
-    taxInvoiceProfiles[0]?.id ?? ""
+    taxProfiles[0]?.id ?? ""
   );
   const [lesseeName, setLesseeName] = useState("");
   const [lessorCompanyName, setLessorCompanyName] = useState("");
@@ -42,12 +43,15 @@ export default function FormClient({
   const [taxAttachment, setTaxAttachment] = useState<Attachment>(null);
   const [taxUploading, setTaxUploading] = useState(false);
   const [taxUploadError, setTaxUploadError] = useState<string | null>(null);
+  const [taxSaving, setTaxSaving] = useState(false);
+  const [taxSaveError, setTaxSaveError] = useState<string | null>(null);
 
+  const [contractProfilesState, setContractProfilesState] = useState(contractProfiles);
   const [contractMode, setContractMode] = useState<"select" | "new">(
-    contractProfiles.length > 0 ? "select" : "new"
+    contractProfilesState.length > 0 ? "select" : "new"
   );
   const [selectedContractId, setSelectedContractId] = useState(
-    contractProfiles[0]?.id ?? ""
+    contractProfilesState[0]?.id ?? ""
   );
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
@@ -56,6 +60,8 @@ export default function FormClient({
   const [contractAttachment, setContractAttachment] = useState<Attachment>(null);
   const [contractUploading, setContractUploading] = useState(false);
   const [contractUploadError, setContractUploadError] = useState<string | null>(null);
+  const [contractSaving, setContractSaving] = useState(false);
+  const [contractSaveError, setContractSaveError] = useState<string | null>(null);
 
   const [managerContactId, setManagerContactId] = useState(
     managerContacts[0]?.id ?? ""
@@ -89,8 +95,99 @@ export default function FormClient({
     }
   }
 
-  const selectedTaxProfile = taxInvoiceProfiles.find((p) => p.id === selectedTaxId);
-  const selectedContractProfile = contractProfiles.find((p) => p.id === selectedContractId);
+  const selectedTaxProfile = taxProfiles.find((p) => p.id === selectedTaxId);
+  const selectedContractProfile = contractProfilesState.find((p) => p.id === selectedContractId);
+
+  async function saveTaxProfile() {
+    setTaxSaveError(null);
+    if (
+      !lesseeName ||
+      !lessorCompanyName ||
+      !lessorRepName ||
+      !vehicleNumber ||
+      !businessRegNumber ||
+      !repPhone
+    ) {
+      setTaxSaveError("필수 항목을 모두 입력해 주세요.");
+      return;
+    }
+    setTaxSaving(true);
+    try {
+      const res = await fetch("/api/profiles/tax-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lesseeName,
+          lessorCompanyName,
+          lessorRepName,
+          vehicleNumber,
+          businessRegNumber,
+          repPhone,
+          attachmentUrl: taxAttachment?.url,
+          attachmentName: taxAttachment?.name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setTaxSaveError(data.error ?? "저장에 실패했습니다.");
+        return;
+      }
+      setTaxProfiles((prev) => [...prev, data.profile]);
+      setSelectedTaxId(data.profile.id);
+      setTaxMode("select");
+      setLesseeName("");
+      setLessorCompanyName("");
+      setLessorRepName("");
+      setVehicleNumber("");
+      setBusinessRegNumber("");
+      setRepPhone("");
+      setTaxAttachment(null);
+    } catch {
+      setTaxSaveError("네트워크 오류로 저장하지 못했습니다.");
+    } finally {
+      setTaxSaving(false);
+    }
+  }
+
+  async function saveContractProfile() {
+    setContractSaveError(null);
+    if (!periodStart || !periodEnd || !unitPrice || !paymentDueTerms) {
+      setContractSaveError("필수 항목을 모두 입력해 주세요.");
+      return;
+    }
+    setContractSaving(true);
+    try {
+      const res = await fetch("/api/profiles/contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          periodStart,
+          periodEnd,
+          unitPrice,
+          paymentDueTerms,
+          attachmentUrl: contractAttachment?.url,
+          attachmentName: contractAttachment?.name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setContractSaveError(data.error ?? "저장에 실패했습니다.");
+        return;
+      }
+      setContractProfilesState((prev) => [...prev, data.profile]);
+      setSelectedContractId(data.profile.id);
+      setContractMode("select");
+      setPeriodStart("");
+      setPeriodEnd("");
+      setUnitPrice("");
+      setPaymentDueTerms("");
+      setContractAttachment(null);
+    } catch {
+      setContractSaveError("네트워크 오류로 저장하지 못했습니다.");
+    } finally {
+      setContractSaving(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -234,7 +331,7 @@ export default function FormClient({
           <ModeToggle
             mode={taxMode}
             onChange={setTaxMode}
-            hasSaved={taxInvoiceProfiles.length > 0}
+            hasSaved={taxProfiles.length > 0}
             selectLabel="등록된 정보 불러오기"
             newLabel="신규 등록"
           />
@@ -247,7 +344,7 @@ export default function FormClient({
                   onChange={(e) => setSelectedTaxId(e.target.value)}
                   className={inputCls}
                 >
-                  {taxInvoiceProfiles.map((p) => (
+                  {taxProfiles.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.lessorCompanyName} / {p.vehicleNumber} (임차인 {p.lesseeName})
                     </option>
@@ -320,6 +417,15 @@ export default function FormClient({
                 }
                 onRemove={() => setTaxAttachment(null)}
               />
+              {taxSaveError && <p className="text-xs text-red-600">{taxSaveError}</p>}
+              <button
+                type="button"
+                onClick={saveTaxProfile}
+                disabled={taxSaving || taxUploading}
+                className="rounded-lg bg-slate-800 px-3 py-2.5 text-[15px] font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                {taxSaving ? "저장 중..." : "세금계산서 정보 등록"}
+              </button>
             </>
           )}
         </Section>
@@ -328,7 +434,7 @@ export default function FormClient({
           <ModeToggle
             mode={contractMode}
             onChange={setContractMode}
-            hasSaved={contractProfiles.length > 0}
+            hasSaved={contractProfilesState.length > 0}
             selectLabel="등록된 계약서 불러오기"
             newLabel="신규 등록"
           />
@@ -341,7 +447,7 @@ export default function FormClient({
                   onChange={(e) => setSelectedContractId(e.target.value)}
                   className={inputCls}
                 >
-                  {contractProfiles.map((p) => (
+                  {contractProfilesState.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.periodStart} ~ {p.periodEnd} / 단가 {p.unitPrice}
                     </option>
@@ -400,6 +506,15 @@ export default function FormClient({
                 }
                 onRemove={() => setContractAttachment(null)}
               />
+              {contractSaveError && <p className="text-xs text-red-600">{contractSaveError}</p>}
+              <button
+                type="button"
+                onClick={saveContractProfile}
+                disabled={contractSaving || contractUploading}
+                className="rounded-lg bg-slate-800 px-3 py-2.5 text-[15px] font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                {contractSaving ? "저장 중..." : "계약서 정보 등록"}
+              </button>
             </>
           )}
         </Section>

@@ -47,6 +47,8 @@ export async function POST(req: Request) {
     vehicleNumber: body.vehicleNumber,
     businessRegNumber: body.businessRegNumber,
     repPhone: body.repPhone,
+    attachmentUrl: body.attachmentUrl ? String(body.attachmentUrl) : undefined,
+    attachmentName: body.attachmentName ? String(body.attachmentName) : undefined,
     createdAt: new Date().toISOString(),
   };
 
