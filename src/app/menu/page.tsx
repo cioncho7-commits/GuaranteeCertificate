@@ -50,7 +50,7 @@ export default async function MenuPage() {
       <div>
         <p className="text-xs text-slate-400">{userName}님</p>
         <h1 className="mt-1 text-xl font-bold text-slate-900">
-          한북지회 서비스
+          한북지회 온라인 사업단
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           이용하실 서비스를 선택해 주세요.
