@@ -23,6 +23,7 @@ export default async function MenuPage() {
       title: "한북지회 소개",
       desc: "한북지회에 대해 알아보세요",
       icon: "🏢",
+      wide: true,
     },
     {
       href: "/report/subcontract",
@@ -41,14 +42,12 @@ export default async function MenuPage() {
       title: "보증보험 가입요청",
       desc: "건설기계 대여대금 지급보증서 발급을 신청합니다",
       icon: "🛡️",
-      wide: true,
     },
     {
       href: "/report/other",
       title: "기타 신고",
       desc: "그 외 신고하실 내용을 자유롭게 접수합니다",
       icon: "💬",
-      wide: true,
     },
   ];
 
