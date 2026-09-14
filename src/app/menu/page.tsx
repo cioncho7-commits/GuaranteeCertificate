@@ -44,10 +44,10 @@ export default async function MenuPage() {
       icon: "🛡️",
     },
     {
-      href: "/report/other",
-      title: "기타 신고",
-      desc: "그 외 신고하실 내용을 자유롭게 접수합니다",
-      icon: "💬",
+      href: "/report/payment-system",
+      title: "전자대금지급시스템(하도급지킴이) 미사용신고",
+      desc: "전자대금지급시스템 미사용 사례를 신고합니다",
+      icon: "💳",
     },
   ];
 

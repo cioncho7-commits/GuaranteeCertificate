@@ -54,18 +54,17 @@ export type Submission = {
   createdAt: string;
 };
 
-export type ReportType = "subcontract" | "no_contract" | "other";
+export type ReportType = "subcontract" | "no_contract" | "payment_system";
 
-// 불법하도급신고 / 계약서미작성신고 / 기타신고
+// 불법하도급신고 / 계약서미작성신고 / 전자대금지급시스템(하도급지킴이) 미사용신고
 export type Report = {
   id: string;
   ownerId: string;
   type: ReportType;
-  siteName?: string; // 현장명 (기타신고에서는 사용 안 함)
-  mainContractorName?: string; // 원청명 (기타신고에서는 사용 안 함)
-  partnerCompanyName?: string; // 협력사명 (기타신고에서는 사용 안 함)
+  siteName: string; // 현장명
+  mainContractorName: string; // 원청명
+  partnerCompanyName: string; // 협력사명
   resubcontractorName?: string; // 재하도급업자 (불법하도급신고에서만 사용)
-  title?: string; // 제목 (기타신고에서만 사용)
   description: string; // 내용
   attachmentUrl?: string; // 증빙자료 사진/PDF
   attachmentName?: string;
