@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { ContractProfile, ManagerContact, TaxInvoiceProfile } from "@/lib/types";
+import type { ManagerContact } from "@/lib/types";
 
 type Props = {
   userName: string;
-  taxInvoiceProfiles: TaxInvoiceProfile[];
-  contractProfiles: ContractProfile[];
   managerContacts: ManagerContact[];
 };
 
@@ -18,22 +16,10 @@ type SubmitOutcome = {
 
 type Attachment = { url: string; name: string } | null;
 
-export default function FormClient({
-  userName,
-  taxInvoiceProfiles,
-  contractProfiles,
-  managerContacts,
-}: Props) {
+export default function FormClient({ userName, managerContacts }: Props) {
   const [siteName, setSiteName] = useState("");
   const [clientName, setClientName] = useState("");
 
-  const [taxProfiles, setTaxProfiles] = useState(taxInvoiceProfiles);
-  const [taxMode, setTaxMode] = useState<"select" | "new">(
-    taxProfiles.length > 0 ? "select" : "new"
-  );
-  const [selectedTaxId, setSelectedTaxId] = useState(
-    taxProfiles[0]?.id ?? ""
-  );
   const [lesseeName, setLesseeName] = useState("");
   const [lessorCompanyName, setLessorCompanyName] = useState("");
   const [lessorRepName, setLessorRepName] = useState("");
@@ -43,16 +29,7 @@ export default function FormClient({
   const [taxAttachment, setTaxAttachment] = useState<Attachment>(null);
   const [taxUploading, setTaxUploading] = useState(false);
   const [taxUploadError, setTaxUploadError] = useState<string | null>(null);
-  const [taxSaving, setTaxSaving] = useState(false);
-  const [taxSaveError, setTaxSaveError] = useState<string | null>(null);
 
-  const [contractProfilesState, setContractProfilesState] = useState(contractProfiles);
-  const [contractMode, setContractMode] = useState<"select" | "new">(
-    contractProfilesState.length > 0 ? "select" : "new"
-  );
-  const [selectedContractId, setSelectedContractId] = useState(
-    contractProfilesState[0]?.id ?? ""
-  );
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
@@ -60,8 +37,6 @@ export default function FormClient({
   const [contractAttachment, setContractAttachment] = useState<Attachment>(null);
   const [contractUploading, setContractUploading] = useState(false);
   const [contractUploadError, setContractUploadError] = useState<string | null>(null);
-  const [contractSaving, setContractSaving] = useState(false);
-  const [contractSaveError, setContractSaveError] = useState<string | null>(null);
 
   const [managerContactId, setManagerContactId] = useState(
     managerContacts[0]?.id ?? ""
@@ -95,100 +70,6 @@ export default function FormClient({
     }
   }
 
-  const selectedTaxProfile = taxProfiles.find((p) => p.id === selectedTaxId);
-  const selectedContractProfile = contractProfilesState.find((p) => p.id === selectedContractId);
-
-  async function saveTaxProfile() {
-    setTaxSaveError(null);
-    if (
-      !lesseeName ||
-      !lessorCompanyName ||
-      !lessorRepName ||
-      !vehicleNumber ||
-      !businessRegNumber ||
-      !repPhone
-    ) {
-      setTaxSaveError("필수 항목을 모두 입력해 주세요.");
-      return;
-    }
-    setTaxSaving(true);
-    try {
-      const res = await fetch("/api/profiles/tax-invoice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lesseeName,
-          lessorCompanyName,
-          lessorRepName,
-          vehicleNumber,
-          businessRegNumber,
-          repPhone,
-          attachmentUrl: taxAttachment?.url,
-          attachmentName: taxAttachment?.name,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setTaxSaveError(data.error ?? "저장에 실패했습니다.");
-        return;
-      }
-      setTaxProfiles((prev) => [...prev, data.profile]);
-      setSelectedTaxId(data.profile.id);
-      setTaxMode("select");
-      setLesseeName("");
-      setLessorCompanyName("");
-      setLessorRepName("");
-      setVehicleNumber("");
-      setBusinessRegNumber("");
-      setRepPhone("");
-      setTaxAttachment(null);
-    } catch {
-      setTaxSaveError("네트워크 오류로 저장하지 못했습니다.");
-    } finally {
-      setTaxSaving(false);
-    }
-  }
-
-  async function saveContractProfile() {
-    setContractSaveError(null);
-    if (!periodStart || !periodEnd || !unitPrice || !paymentDueTerms) {
-      setContractSaveError("필수 항목을 모두 입력해 주세요.");
-      return;
-    }
-    setContractSaving(true);
-    try {
-      const res = await fetch("/api/profiles/contract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          periodStart,
-          periodEnd,
-          unitPrice,
-          paymentDueTerms,
-          attachmentUrl: contractAttachment?.url,
-          attachmentName: contractAttachment?.name,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setContractSaveError(data.error ?? "저장에 실패했습니다.");
-        return;
-      }
-      setContractProfilesState((prev) => [...prev, data.profile]);
-      setSelectedContractId(data.profile.id);
-      setContractMode("select");
-      setPeriodStart("");
-      setPeriodEnd("");
-      setUnitPrice("");
-      setPaymentDueTerms("");
-      setContractAttachment(null);
-    } catch {
-      setContractSaveError("네트워크 오류로 저장하지 못했습니다.");
-    } finally {
-      setContractSaving(false);
-    }
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setOutcome(null);
@@ -202,37 +83,31 @@ export default function FormClient({
       return;
     }
 
-    const taxInvoice =
-      taxMode === "select"
-        ? { mode: "existing" as const, id: selectedTaxId }
-        : {
-            mode: "new" as const,
-            data: {
-              lesseeName,
-              lessorCompanyName,
-              lessorRepName,
-              vehicleNumber,
-              businessRegNumber,
-              repPhone,
-              attachmentUrl: taxAttachment?.url,
-              attachmentName: taxAttachment?.name,
-            },
-          };
+    const taxInvoice = {
+      mode: "new" as const,
+      data: {
+        lesseeName,
+        lessorCompanyName,
+        lessorRepName,
+        vehicleNumber,
+        businessRegNumber,
+        repPhone,
+        attachmentUrl: taxAttachment?.url,
+        attachmentName: taxAttachment?.name,
+      },
+    };
 
-    const contract =
-      contractMode === "select"
-        ? { mode: "existing" as const, id: selectedContractId }
-        : {
-            mode: "new" as const,
-            data: {
-              periodStart,
-              periodEnd,
-              unitPrice,
-              paymentDueTerms,
-              attachmentUrl: contractAttachment?.url,
-              attachmentName: contractAttachment?.name,
-            },
-          };
+    const contract = {
+      mode: "new" as const,
+      data: {
+        periodStart,
+        periodEnd,
+        unitPrice,
+        paymentDueTerms,
+        attachmentUrl: contractAttachment?.url,
+        attachmentName: contractAttachment?.name,
+      },
+    };
 
     setSubmitting(true);
     try {
@@ -328,195 +203,119 @@ export default function FormClient({
         </Section>
 
         <Section title="2. 세금계산서 등록">
-          <ModeToggle
-            mode={taxMode}
-            onChange={setTaxMode}
-            hasSaved={taxProfiles.length > 0}
-            selectLabel="등록된 정보 불러오기"
-            newLabel="신규 등록"
+          <Field label="건설기계임차인명">
+            <input
+              required
+              value={lesseeName}
+              onChange={(e) => setLesseeName(e.target.value)}
+              className={inputCls}
+            />
+          </Field>
+          <Field label="건설기계임대인명 (회사명)">
+            <input
+              required
+              value={lessorCompanyName}
+              onChange={(e) => setLessorCompanyName(e.target.value)}
+              placeholder="사업자등록증상 회사명"
+              className={inputCls}
+            />
+          </Field>
+          <Field label="건설기계임대인명 (대표자명)">
+            <input
+              required
+              value={lessorRepName}
+              onChange={(e) => setLessorRepName(e.target.value)}
+              className={inputCls}
+            />
+          </Field>
+          <Field label="차량번호">
+            <input
+              required
+              value={vehicleNumber}
+              onChange={(e) => setVehicleNumber(e.target.value)}
+              placeholder="예: 12가 3456"
+              className={inputCls}
+            />
+          </Field>
+          <Field label="사업자등록번호">
+            <input
+              required
+              value={businessRegNumber}
+              onChange={(e) => setBusinessRegNumber(e.target.value)}
+              placeholder="000-00-00000"
+              className={inputCls}
+            />
+          </Field>
+          <Field label="대표자 휴대폰번호">
+            <input
+              required
+              value={repPhone}
+              onChange={(e) => setRepPhone(e.target.value)}
+              placeholder="010-0000-0000"
+              className={inputCls}
+            />
+          </Field>
+          <FileAttachmentField
+            label="세금계산서 첨부 (사진/PDF, 선택)"
+            attachment={taxAttachment}
+            uploading={taxUploading}
+            error={taxUploadError}
+            onSelect={(file) =>
+              uploadFile(file, setTaxUploading, setTaxUploadError, setTaxAttachment)
+            }
+            onRemove={() => setTaxAttachment(null)}
           />
-
-          {taxMode === "select" ? (
-            <>
-              <Field label="등록된 세금계산서 정보">
-                <select
-                  value={selectedTaxId}
-                  onChange={(e) => setSelectedTaxId(e.target.value)}
-                  className={inputCls}
-                >
-                  {taxProfiles.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.lessorCompanyName} / {p.vehicleNumber} (임차인 {p.lesseeName})
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <AttachmentPreview attachment={selectedTaxProfile?.attachmentUrl ? { url: selectedTaxProfile.attachmentUrl, name: selectedTaxProfile.attachmentName ?? "첨부파일" } : null} />
-            </>
-          ) : (
-            <>
-              <Field label="건설기계임차인명">
-                <input
-                  required
-                  value={lesseeName}
-                  onChange={(e) => setLesseeName(e.target.value)}
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="건설기계임대인명 (회사명)">
-                <input
-                  required
-                  value={lessorCompanyName}
-                  onChange={(e) => setLessorCompanyName(e.target.value)}
-                  placeholder="사업자등록증상 회사명"
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="건설기계임대인명 (대표자명)">
-                <input
-                  required
-                  value={lessorRepName}
-                  onChange={(e) => setLessorRepName(e.target.value)}
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="차량번호">
-                <input
-                  required
-                  value={vehicleNumber}
-                  onChange={(e) => setVehicleNumber(e.target.value)}
-                  placeholder="예: 12가 3456"
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="사업자등록번호">
-                <input
-                  required
-                  value={businessRegNumber}
-                  onChange={(e) => setBusinessRegNumber(e.target.value)}
-                  placeholder="000-00-00000"
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="대표자 휴대폰번호">
-                <input
-                  required
-                  value={repPhone}
-                  onChange={(e) => setRepPhone(e.target.value)}
-                  placeholder="010-0000-0000"
-                  className={inputCls}
-                />
-              </Field>
-              <FileAttachmentField
-                label="세금계산서 첨부 (사진/PDF, 선택)"
-                attachment={taxAttachment}
-                uploading={taxUploading}
-                error={taxUploadError}
-                onSelect={(file) =>
-                  uploadFile(file, setTaxUploading, setTaxUploadError, setTaxAttachment)
-                }
-                onRemove={() => setTaxAttachment(null)}
-              />
-              {taxSaveError && <p className="text-xs text-red-600">{taxSaveError}</p>}
-              <button
-                type="button"
-                onClick={saveTaxProfile}
-                disabled={taxSaving || taxUploading}
-                className="rounded-lg bg-slate-800 px-3 py-2.5 text-[15px] font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {taxSaving ? "저장 중..." : "세금계산서 정보 등록"}
-              </button>
-            </>
-          )}
         </Section>
 
         <Section title="3. 계약서 등록">
-          <ModeToggle
-            mode={contractMode}
-            onChange={setContractMode}
-            hasSaved={contractProfilesState.length > 0}
-            selectLabel="등록된 계약서 불러오기"
-            newLabel="신규 등록"
-          />
-
-          {contractMode === "select" ? (
-            <>
-              <Field label="등록된 계약서">
-                <select
-                  value={selectedContractId}
-                  onChange={(e) => setSelectedContractId(e.target.value)}
-                  className={inputCls}
-                >
-                  {contractProfilesState.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.periodStart} ~ {p.periodEnd} / 단가 {p.unitPrice}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <AttachmentPreview attachment={selectedContractProfile?.attachmentUrl ? { url: selectedContractProfile.attachmentUrl, name: selectedContractProfile.attachmentName ?? "첨부파일" } : null} />
-            </>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="계약기간 시작">
-                  <input
-                    type="date"
-                    required
-                    value={periodStart}
-                    onChange={(e) => setPeriodStart(e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label="계약기간 종료">
-                  <input
-                    type="date"
-                    required
-                    value={periodEnd}
-                    onChange={(e) => setPeriodEnd(e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
-              </div>
-              <Field label="단가">
-                <input
-                  required
-                  value={unitPrice}
-                  onChange={(e) => setUnitPrice(e.target.value)}
-                  placeholder="예: 시간당 55,000원"
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="결제기한">
-                <input
-                  required
-                  value={paymentDueTerms}
-                  onChange={(e) => setPaymentDueTerms(e.target.value)}
-                  placeholder="예: 익월 10일"
-                  className={inputCls}
-                />
-              </Field>
-              <FileAttachmentField
-                label="계약서 첨부 (사진/PDF, 선택)"
-                attachment={contractAttachment}
-                uploading={contractUploading}
-                error={contractUploadError}
-                onSelect={(file) =>
-                  uploadFile(file, setContractUploading, setContractUploadError, setContractAttachment)
-                }
-                onRemove={() => setContractAttachment(null)}
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="계약기간 시작">
+              <input
+                type="date"
+                required
+                value={periodStart}
+                onChange={(e) => setPeriodStart(e.target.value)}
+                className={inputCls}
               />
-              {contractSaveError && <p className="text-xs text-red-600">{contractSaveError}</p>}
-              <button
-                type="button"
-                onClick={saveContractProfile}
-                disabled={contractSaving || contractUploading}
-                className="rounded-lg bg-slate-800 px-3 py-2.5 text-[15px] font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {contractSaving ? "저장 중..." : "계약서 정보 등록"}
-              </button>
-            </>
-          )}
+            </Field>
+            <Field label="계약기간 종료">
+              <input
+                type="date"
+                required
+                value={periodEnd}
+                onChange={(e) => setPeriodEnd(e.target.value)}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+          <Field label="단가">
+            <input
+              required
+              value={unitPrice}
+              onChange={(e) => setUnitPrice(e.target.value)}
+              placeholder="예: 시간당 55,000원"
+              className={inputCls}
+            />
+          </Field>
+          <Field label="결제기한">
+            <input
+              required
+              value={paymentDueTerms}
+              onChange={(e) => setPaymentDueTerms(e.target.value)}
+              placeholder="예: 익월 10일"
+              className={inputCls}
+            />
+          </Field>
+          <FileAttachmentField
+            label="계약서 첨부 (사진/PDF, 선택)"
+            attachment={contractAttachment}
+            uploading={contractUploading}
+            error={contractUploadError}
+            onSelect={(file) =>
+              uploadFile(file, setContractUploading, setContractUploadError, setContractAttachment)
+            }
+            onRemove={() => setContractAttachment(null)}
+          />
         </Section>
 
         <Section title="4. 담당자">
@@ -591,46 +390,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function ModeToggle({
-  mode,
-  onChange,
-  hasSaved,
-  selectLabel,
-  newLabel,
-}: {
-  mode: "select" | "new";
-  onChange: (m: "select" | "new") => void;
-  hasSaved: boolean;
-  selectLabel: string;
-  newLabel: string;
-}) {
-  return (
-    <div className="flex gap-2 text-sm">
-      <button
-        type="button"
-        disabled={!hasSaved}
-        onClick={() => onChange("select")}
-        className={`flex-1 rounded-lg px-3 py-2 font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
-          mode === "select"
-            ? "bg-blue-700 text-white"
-            : "bg-slate-100 text-slate-600"
-        }`}
-      >
-        {selectLabel}
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange("new")}
-        className={`flex-1 rounded-lg px-3 py-2 font-medium transition ${
-          mode === "new" ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-600"
-        }`}
-      >
-        {newLabel}
-      </button>
-    </div>
-  );
-}
-
 function FileAttachmentField({
   label,
   attachment,
@@ -683,19 +442,5 @@ function FileAttachmentField({
       {uploading && <p className="text-xs text-slate-400">업로드 중...</p>}
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
-  );
-}
-
-function AttachmentPreview({ attachment }: { attachment: Attachment }) {
-  if (!attachment) return null;
-  return (
-    <a
-      href={attachment.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-1 text-sm text-blue-700 underline underline-offset-2"
-    >
-      첨부파일: {attachment.name}
-    </a>
   );
 }
