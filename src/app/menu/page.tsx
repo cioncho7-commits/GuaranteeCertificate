@@ -23,28 +23,24 @@ export default async function MenuPage() {
       title: "한북지회 소개",
       desc: "한북지회에 대해 알아보세요",
       icon: "🏢",
-      gradient: "from-blue-500 to-indigo-600",
     },
     {
       href: "/report/subcontract",
       title: "불법하도급 신고",
       desc: "불법 하도급 사례를 신고합니다",
       icon: "⚠️",
-      gradient: "from-rose-500 to-red-600",
     },
     {
       href: "/report/no-contract",
       title: "계약서 미작성 신고",
       desc: "계약서 미작성 사례를 신고합니다",
       icon: "📝",
-      gradient: "from-amber-500 to-orange-600",
     },
     {
       href: "/form",
       title: "보증보험 가입요청",
       desc: "건설기계 대여대금 지급보증서 발급을 신청합니다",
       icon: "🛡️",
-      gradient: "from-emerald-500 to-teal-600",
       wide: true,
     },
     {
@@ -52,7 +48,6 @@ export default async function MenuPage() {
       title: "기타 신고",
       desc: "그 외 신고하실 내용을 자유롭게 접수합니다",
       icon: "💬",
-      gradient: "from-violet-500 to-purple-600",
       wide: true,
     },
   ];
@@ -74,7 +69,7 @@ export default async function MenuPage() {
           <a
             key={item.href}
             href={item.href}
-            className={`flex flex-col justify-between gap-4 rounded-2xl bg-gradient-to-br ${item.gradient} p-4 text-white shadow-sm transition active:scale-[0.98] hover:shadow-md ${
+            className={`flex flex-col justify-between gap-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-4 text-white shadow-sm transition active:scale-[0.98] hover:shadow-md ${
               item.wide ? "col-span-2" : ""
             }`}
           >
