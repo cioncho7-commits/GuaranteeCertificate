@@ -5,9 +5,9 @@ import Naver from "next-auth/providers/naver";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    Google({ checks: ["state"] }),
-    Kakao({ checks: ["state"] }),
-    Naver({ checks: ["state"] }),
+    Google({ checks: ["none"] }),
+    Kakao({ checks: ["none"] }),
+    Naver({ checks: ["none"] }),
   ],
   pages: {
     signIn: "/",
