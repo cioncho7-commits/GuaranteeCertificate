@@ -61,7 +61,10 @@ jobs:
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         working-directory: android
-        run: echo "$KEYSTORE_B64" | base64 -d > release.keystore
+        # ANDROID_KEYSTORE_PATH(release.keystore)는 android/app/build.gradle의
+        # storeFile file(...) 호출 안에서 app 모듈 디렉터리(android/app) 기준으로
+        # 해석되므로, 여기서도 android/app/release.keystore로 만들어야 한다.
+        run: echo "$KEYSTORE_B64" | base64 -d > app/release.keystore
 
       - name: Build signed release AAB (Play Store)
         if: steps.check_keystore.outputs.has_keystore == 'true'
