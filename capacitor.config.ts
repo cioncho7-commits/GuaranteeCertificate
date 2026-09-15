@@ -1,6 +1,6 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
-const PRODUCTION_URL = "https://machinsure.com";
+const PRODUCTION_URL = "https://www.machinsure.com";
 
 const config: CapacitorConfig = {
   appId: "com.guaranteecert.app",

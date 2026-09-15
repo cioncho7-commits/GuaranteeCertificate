@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth";
 import { getConsent } from "@/lib/consent";
 
 export default async function MenuPage() {
@@ -53,14 +53,29 @@ export default async function MenuPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-5 py-8">
-      <div>
-        <p className="text-xs text-slate-400">{userName}님</p>
-        <h1 className="mt-1 text-xl font-bold text-slate-900">
-          한북지회 온라인 사업단
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          이용하실 서비스를 선택해 주세요.
-        </p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-xs text-slate-400">{userName}님</p>
+          <h1 className="mt-1 text-xl font-bold text-slate-900">
+            한북지회 온라인 사업단
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            이용하실 서비스를 선택해 주세요.
+          </p>
+        </div>
+        <form
+          action={async () => {
+            "use server";
+            await signOut({ redirectTo: "/" });
+          }}
+        >
+          <button
+            type="submit"
+            className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          >
+            로그아웃
+          </button>
+        </form>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
