@@ -4,7 +4,11 @@ import Kakao from "next-auth/providers/kakao";
 import Naver from "next-auth/providers/naver";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [Google, Kakao, Naver],
+  providers: [
+    Google({ checks: ["state"] }),
+    Kakao({ checks: ["state"] }),
+    Naver({ checks: ["state"] }),
+  ],
   pages: {
     signIn: "/",
   },
